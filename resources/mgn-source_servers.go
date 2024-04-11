@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/mgn"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -31,7 +31,9 @@ func ListMGNSourceServers(sess *session.Session) ([]Resource, error) {
 		output, err := svc.DescribeSourceServers(params)
 		if err != nil {
 			if IsAWSError(err, mgn.ErrCodeUninitializedAccountException) {
-				logrus.Info("MGNSourceServer: Account not initialized for Application Migration Service. Ignore if you haven't set it up.")
+				logrus.Info(
+					"MGNSourceServer: Account not initialized for Application Migration Service. Ignore if you haven't set it up.",
+				)
 				return nil, nil
 			}
 			return nil, err

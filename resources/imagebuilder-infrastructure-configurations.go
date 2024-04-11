@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/imagebuilder"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type ImageBuilderInfrastructureConfiguration struct {
@@ -12,7 +12,10 @@ type ImageBuilderInfrastructureConfiguration struct {
 }
 
 func init() {
-	register("ImageBuilderInfrastructureConfiguration", ListImageBuilderInfrastructureConfigurations)
+	register(
+		"ImageBuilderInfrastructureConfiguration",
+		ListImageBuilderInfrastructureConfigurations,
+	)
 }
 
 func ListImageBuilderInfrastructureConfigurations(sess *session.Session) ([]Resource, error) {
@@ -46,9 +49,11 @@ func ListImageBuilderInfrastructureConfigurations(sess *session.Session) ([]Reso
 }
 
 func (e *ImageBuilderInfrastructureConfiguration) Remove() error {
-	_, err := e.svc.DeleteInfrastructureConfiguration(&imagebuilder.DeleteInfrastructureConfigurationInput{
-		InfrastructureConfigurationArn: &e.arn,
-	})
+	_, err := e.svc.DeleteInfrastructureConfiguration(
+		&imagebuilder.DeleteInfrastructureConfigurationInput{
+			InfrastructureConfigurationArn: &e.arn,
+		},
+	)
 	return err
 }
 

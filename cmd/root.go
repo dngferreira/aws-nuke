@@ -6,9 +6,9 @@ import (
 	"sort"
 
 	"github.com/aws/aws-sdk-go/aws/endpoints"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/awsutil"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
-	"github.com/rebuy-de/aws-nuke/v2/resources"
+	"github.com/dngferreira/aws-nuke/v2/pkg/awsutil"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/resources"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -65,7 +65,10 @@ func NewRootCommand() *cobra.Command {
 		if defaultRegion != "" {
 			awsutil.DefaultRegionID = defaultRegion
 			switch defaultRegion {
-			case endpoints.UsEast1RegionID, endpoints.UsEast2RegionID, endpoints.UsWest1RegionID, endpoints.UsWest2RegionID:
+			case endpoints.UsEast1RegionID,
+				endpoints.UsEast2RegionID,
+				endpoints.UsWest1RegionID,
+				endpoints.UsWest2RegionID:
 				awsutil.DefaultAWSPartitionID = endpoints.AwsPartitionID
 			case endpoints.UsGovEast1RegionID, endpoints.UsGovWest1RegionID:
 				awsutil.DefaultAWSPartitionID = endpoints.AwsUsGovPartitionID
@@ -73,7 +76,10 @@ func NewRootCommand() *cobra.Command {
 				awsutil.DefaultAWSPartitionID = endpoints.AwsCnPartitionID
 			default:
 				if config.CustomEndpoints.GetRegion(defaultRegion) == nil {
-					err = fmt.Errorf("The custom region '%s' must be specified in the configuration 'endpoints'", defaultRegion)
+					err = fmt.Errorf(
+						"The custom region '%s' must be specified in the configuration 'endpoints'",
+						defaultRegion,
+					)
 					log.Error(err.Error())
 					return err
 				}

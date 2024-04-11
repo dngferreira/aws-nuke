@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -37,17 +37,20 @@ func ListAppConfigHostedConfigurationVersions(sess *session.Session) ([]Resource
 			ConfigurationProfileId: configurationProfile.id,
 			MaxResults:             aws.Int64(50),
 		}
-		err := svc.ListHostedConfigurationVersionsPages(params, func(page *appconfig.ListHostedConfigurationVersionsOutput, lastPage bool) bool {
-			for _, item := range page.Items {
-				resources = append(resources, &AppConfigHostedConfigurationVersion{
-					svc:                    svc,
-					applicationId:          configurationProfile.applicationId,
-					configurationProfileId: configurationProfile.id,
-					versionNumber:          item.VersionNumber,
-				})
-			}
-			return true
-		})
+		err := svc.ListHostedConfigurationVersionsPages(
+			params,
+			func(page *appconfig.ListHostedConfigurationVersionsOutput, lastPage bool) bool {
+				for _, item := range page.Items {
+					resources = append(resources, &AppConfigHostedConfigurationVersion{
+						svc:                    svc,
+						applicationId:          configurationProfile.applicationId,
+						configurationProfileId: configurationProfile.id,
+						versionNumber:          item.VersionNumber,
+					})
+				}
+				return true
+			},
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -56,11 +59,13 @@ func ListAppConfigHostedConfigurationVersions(sess *session.Session) ([]Resource
 }
 
 func (f *AppConfigHostedConfigurationVersion) Remove() error {
-	_, err := f.svc.DeleteHostedConfigurationVersion(&appconfig.DeleteHostedConfigurationVersionInput{
-		ApplicationId:          f.applicationId,
-		ConfigurationProfileId: f.configurationProfileId,
-		VersionNumber:          f.versionNumber,
-	})
+	_, err := f.svc.DeleteHostedConfigurationVersion(
+		&appconfig.DeleteHostedConfigurationVersionInput{
+			ApplicationId:          f.applicationId,
+			ConfigurationProfileId: f.configurationProfileId,
+			VersionNumber:          f.versionNumber,
+		},
+	)
 	return err
 }
 

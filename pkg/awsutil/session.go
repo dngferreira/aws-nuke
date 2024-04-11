@@ -14,7 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3control"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -83,7 +83,9 @@ func (c *Credentials) rootSession() (*session.Session, error) {
 				},
 			}
 		case c.HasProfile() && c.HasKeys():
-			return nil, fmt.Errorf("You have to specify a profile or credentials for at least one region.")
+			return nil, fmt.Errorf(
+				"You have to specify a profile or credentials for at least one region.",
+			)
 
 		case c.HasKeys():
 			opts = session.Options{
@@ -203,7 +205,11 @@ func skipMissingServiceInRegionHandler(r *request.Request) {
 	region := *r.Config.Region
 	service := r.ClientInfo.ServiceName
 
-	rs, ok := endpoints.RegionsForService(endpoints.DefaultPartitions(), DefaultAWSPartitionID, service)
+	rs, ok := endpoints.RegionsForService(
+		endpoints.DefaultPartitions(),
+		DefaultAWSPartitionID,
+		service,
+	)
 	if !ok {
 		// This means that the service does not exist and this shouldn't be handled here.
 		return
@@ -230,11 +236,20 @@ func skipGlobalHandler(global bool) func(r *request.Request) {
 			// Rewrite S3 Control ServiceName to proper EndpointsID
 			// https://github.com/rebuy-de/aws-nuke/issues/708
 		}
-		rs, ok := endpoints.RegionsForService(endpoints.DefaultPartitions(), DefaultAWSPartitionID, service)
+		rs, ok := endpoints.RegionsForService(
+			endpoints.DefaultPartitions(),
+			DefaultAWSPartitionID,
+			service,
+		)
 		if !ok {
 			// This means that the service does not exist in the endpoints list.
 			if global {
-				r.Error = ErrSkipRequest(fmt.Sprintf("service '%s' is was not found in the endpoint list; assuming it is not global", service))
+				r.Error = ErrSkipRequest(
+					fmt.Sprintf(
+						"service '%s' is was not found in the endpoint list; assuming it is not global",
+						service,
+					),
+				)
 			} else {
 				host := r.HTTPRequest.URL.Hostname()
 				_, err := net.LookupHost(host)
@@ -247,12 +262,16 @@ func skipGlobalHandler(global bool) func(r *request.Request) {
 		}
 
 		if len(rs) == 0 && !global {
-			r.Error = ErrSkipRequest(fmt.Sprintf("service '%s' is global, but the session is not", service))
+			r.Error = ErrSkipRequest(
+				fmt.Sprintf("service '%s' is global, but the session is not", service),
+			)
 			return
 		}
 
 		if (len(rs) > 0 && global) && service != "sts" {
-			r.Error = ErrSkipRequest(fmt.Sprintf("service '%s' is not global, but the session is", service))
+			r.Error = ErrSkipRequest(
+				fmt.Sprintf("service '%s' is not global, but the session is", service),
+			)
 			return
 		}
 	}

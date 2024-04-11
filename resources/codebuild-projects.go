@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/codebuild"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type CodeBuildProject struct {
@@ -18,7 +18,9 @@ func init() {
 
 func GetTags(svc *codebuild.CodeBuild, project *string) map[string]*string {
 	tags := make(map[string]*string)
-	batchResult, _ := svc.BatchGetProjects(&codebuild.BatchGetProjectsInput{Names: []*string{project}})
+	batchResult, _ := svc.BatchGetProjects(
+		&codebuild.BatchGetProjectsInput{Names: []*string{project}},
+	)
 
 	for _, project := range batchResult.Projects {
 		if len(project.Tags) > 0 {

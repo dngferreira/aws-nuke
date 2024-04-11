@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,17 +36,20 @@ func ListAppConfigEnvironments(sess *session.Session) ([]Resource, error) {
 			ApplicationId: application.id,
 			MaxResults:    aws.Int64(50),
 		}
-		err := svc.ListEnvironmentsPages(params, func(page *appconfig.ListEnvironmentsOutput, lastPage bool) bool {
-			for _, item := range page.Items {
-				resources = append(resources, &AppConfigEnvironment{
-					svc:           svc,
-					applicationId: application.id,
-					id:            item.Id,
-					name:          item.Name,
-				})
-			}
-			return true
-		})
+		err := svc.ListEnvironmentsPages(
+			params,
+			func(page *appconfig.ListEnvironmentsOutput, lastPage bool) bool {
+				for _, item := range page.Items {
+					resources = append(resources, &AppConfigEnvironment{
+						svc:           svc,
+						applicationId: application.id,
+						id:            item.Id,
+						name:          item.Name,
+					})
+				}
+				return true
+			},
+		)
 		if err != nil {
 			return nil, err
 		}

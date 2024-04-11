@@ -2,10 +2,11 @@ package resources
 
 import (
 	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -53,7 +54,11 @@ func (cfs *CloudFormationType) findAllVersionSummaries() ([]*cloudformation.Type
 		Arn: cfs.typeSummary.TypeArn,
 	}
 	for {
-		logrus.Infof("CloudFormationType loading type versions arn=%s page=%d", *cfs.typeSummary.TypeArn, page)
+		logrus.Infof(
+			"CloudFormationType loading type versions arn=%s page=%d",
+			*cfs.typeSummary.TypeArn,
+			page,
+		)
 		resp, err := cfs.svc.ListTypeVersions(params)
 		if err != nil {
 			return nil, err
@@ -76,7 +81,11 @@ func (cfs *CloudFormationType) Remove() error {
 	failed := false
 	for _, typeVersionSummary := range typeVersionSummaries {
 		if *typeVersionSummary.IsDefaultVersion {
-			logrus.Infof("CloudFormationType ignoring default version type=%s version=%s", *cfs.typeSummary.TypeArn, *typeVersionSummary.VersionId)
+			logrus.Infof(
+				"CloudFormationType ignoring default version type=%s version=%s",
+				*cfs.typeSummary.TypeArn,
+				*typeVersionSummary.VersionId,
+			)
 		} else {
 			logrus.Infof("CloudFormationType removing type=%s version=%s", *cfs.typeSummary.TypeArn, *typeVersionSummary.VersionId)
 			if _, err := cfs.svc.DeregisterType(&cloudformation.DeregisterTypeInput{
@@ -91,7 +100,10 @@ func (cfs *CloudFormationType) Remove() error {
 	}
 
 	if failed {
-		return fmt.Errorf("Unable to remove all CloudFormationType versions arn=%s", *cfs.typeSummary.TypeArn)
+		return fmt.Errorf(
+			"Unable to remove all CloudFormationType versions arn=%s",
+			*cfs.typeSummary.TypeArn,
+		)
 	}
 
 	_, err := cfs.svc.DeregisterType(&cloudformation.DeregisterTypeInput{

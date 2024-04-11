@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudfront"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type CloudFrontOriginAccessIdentity struct {
@@ -36,17 +36,21 @@ func ListCloudFrontOriginAccessIdentities(sess *session.Session) ([]Resource, er
 }
 
 func (f *CloudFrontOriginAccessIdentity) Remove() error {
-	resp, err := f.svc.GetCloudFrontOriginAccessIdentity(&cloudfront.GetCloudFrontOriginAccessIdentityInput{
-		Id: f.ID,
-	})
+	resp, err := f.svc.GetCloudFrontOriginAccessIdentity(
+		&cloudfront.GetCloudFrontOriginAccessIdentityInput{
+			Id: f.ID,
+		},
+	)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.svc.DeleteCloudFrontOriginAccessIdentity(&cloudfront.DeleteCloudFrontOriginAccessIdentityInput{
-		Id:      f.ID,
-		IfMatch: resp.ETag,
-	})
+	_, err = f.svc.DeleteCloudFrontOriginAccessIdentity(
+		&cloudfront.DeleteCloudFrontOriginAccessIdentityInput{
+			Id:      f.ID,
+			IfMatch: resp.ETag,
+		},
+	)
 
 	return err
 }

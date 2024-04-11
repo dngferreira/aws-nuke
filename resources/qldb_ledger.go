@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/qldb"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type QLDBLedger struct {
@@ -34,7 +34,9 @@ func ListQLDBLedgers(sess *session.Session) ([]Resource, error) {
 		}
 
 		for _, ledger := range resp.Ledgers {
-			ledgerDescription, err := svc.DescribeLedger(&qldb.DescribeLedgerInput{Name: ledger.Name})
+			ledgerDescription, err := svc.DescribeLedger(
+				&qldb.DescribeLedgerInput{Name: ledger.Name},
+			)
 			if err != nil {
 				return nil, err
 			}
@@ -59,7 +61,8 @@ func (l *QLDBLedger) FeatureFlags(ff config.FeatureFlags) {
 }
 
 func (l *QLDBLedger) Remove() error {
-	if aws.BoolValue(l.ledger.DeletionProtection) && l.featureFlags.DisableDeletionProtection.QLDBLedger {
+	if aws.BoolValue(l.ledger.DeletionProtection) &&
+		l.featureFlags.DisableDeletionProtection.QLDBLedger {
 		modifyParams := &qldb.UpdateLedgerInput{
 			DeletionProtection: aws.Bool(false),
 			Name:               l.ledger.Name,

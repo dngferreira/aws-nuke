@@ -12,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func init() {
@@ -74,13 +74,18 @@ func DescribeS3Buckets(svc *s3.S3) ([]s3.Bucket, error) {
 
 	buckets := make([]s3.Bucket, 0)
 	for _, out := range resp.Buckets {
-		bucketLocationResponse, err := svc.GetBucketLocation(&s3.GetBucketLocationInput{Bucket: out.Name})
+		bucketLocationResponse, err := svc.GetBucketLocation(
+			&s3.GetBucketLocationInput{Bucket: out.Name},
+		)
 
 		if err != nil {
 			continue
 		}
 
-		location := UnPtrString(bucketLocationResponse.LocationConstraint, endpoints.UsEast1RegionID)
+		location := UnPtrString(
+			bucketLocationResponse.LocationConstraint,
+			endpoints.UsEast1RegionID,
+		)
 		region := UnPtrString(svc.Config.Region, endpoints.UsEast1RegionID)
 		if location == region && out != nil {
 			buckets = append(buckets, *out)
@@ -163,7 +168,11 @@ type s3DeleteVersionListIterator struct {
 	objects   []*s3.ObjectVersion
 }
 
-func newS3DeleteVersionListIterator(svc s3iface.S3API, input *s3.ListObjectVersionsInput, opts ...func(*s3DeleteVersionListIterator)) s3manager.BatchDeleteIterator {
+func newS3DeleteVersionListIterator(
+	svc s3iface.S3API,
+	input *s3.ListObjectVersionsInput,
+	opts ...func(*s3DeleteVersionListIterator),
+) s3manager.BatchDeleteIterator {
 	iter := &s3DeleteVersionListIterator{
 		Bucket: input.Bucket,
 		Paginator: request.Pagination{

@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type AppConfigApplication struct {
@@ -23,16 +23,19 @@ func ListAppConfigApplications(sess *session.Session) ([]Resource, error) {
 	params := &appconfig.ListApplicationsInput{
 		MaxResults: aws.Int64(50),
 	}
-	err := svc.ListApplicationsPages(params, func(page *appconfig.ListApplicationsOutput, lastPage bool) bool {
-		for _, item := range page.Items {
-			resources = append(resources, &AppConfigApplication{
-				svc:  svc,
-				id:   item.Id,
-				name: item.Name,
-			})
-		}
-		return true
-	})
+	err := svc.ListApplicationsPages(
+		params,
+		func(page *appconfig.ListApplicationsOutput, lastPage bool) bool {
+			for _, item := range page.Items {
+				resources = append(resources, &AppConfigApplication{
+					svc:  svc,
+					id:   item.Id,
+					name: item.Name,
+				})
+			}
+			return true
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

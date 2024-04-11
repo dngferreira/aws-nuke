@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/elbv2"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type ELBv2TargetGroup struct {
@@ -24,7 +24,10 @@ func ListELBv2TargetGroups(sess *session.Session) ([]Resource, error) {
 	err := svc.DescribeTargetGroupsPages(nil,
 		func(page *elbv2.DescribeTargetGroupsOutput, lastPage bool) bool {
 			for _, targetGroup := range page.TargetGroups {
-				tagReqELBv2TargetGroupARNs = append(tagReqELBv2TargetGroupARNs, targetGroup.TargetGroupArn)
+				tagReqELBv2TargetGroupARNs = append(
+					tagReqELBv2TargetGroupARNs,
+					targetGroup.TargetGroupArn,
+				)
 				targetGroupARNToRsc[*targetGroup.TargetGroupArn] = targetGroup
 			}
 			return !lastPage

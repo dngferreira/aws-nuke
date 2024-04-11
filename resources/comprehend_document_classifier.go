@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,7 +50,11 @@ func (ce *ComprehendDocumentClassifier) Remove() error {
 		fallthrough
 	case "TRAINED":
 		{
-			logrus.Infof("ComprehendDocumentClassifier deleteDocumentClassifier arn=%s status=%s", *ce.documentClassifier.DocumentClassifierArn, *ce.documentClassifier.Status)
+			logrus.Infof(
+				"ComprehendDocumentClassifier deleteDocumentClassifier arn=%s status=%s",
+				*ce.documentClassifier.DocumentClassifierArn,
+				*ce.documentClassifier.Status,
+			)
 			_, err := ce.svc.DeleteDocumentClassifier(&comprehend.DeleteDocumentClassifierInput{
 				DocumentClassifierArn: ce.documentClassifier.DocumentClassifierArn,
 			})
@@ -60,15 +64,25 @@ func (ce *ComprehendDocumentClassifier) Remove() error {
 		fallthrough
 	case "TRAINING":
 		{
-			logrus.Infof("ComprehendDocumentClassifier stopTrainingDocumentClassifier arn=%s status=%s", *ce.documentClassifier.DocumentClassifierArn, *ce.documentClassifier.Status)
-			_, err := ce.svc.StopTrainingDocumentClassifier(&comprehend.StopTrainingDocumentClassifierInput{
-				DocumentClassifierArn: ce.documentClassifier.DocumentClassifierArn,
-			})
+			logrus.Infof(
+				"ComprehendDocumentClassifier stopTrainingDocumentClassifier arn=%s status=%s",
+				*ce.documentClassifier.DocumentClassifierArn,
+				*ce.documentClassifier.Status,
+			)
+			_, err := ce.svc.StopTrainingDocumentClassifier(
+				&comprehend.StopTrainingDocumentClassifierInput{
+					DocumentClassifierArn: ce.documentClassifier.DocumentClassifierArn,
+				},
+			)
 			return err
 		}
 	default:
 		{
-			logrus.Infof("ComprehendDocumentClassifier already deleting arn=%s status=%s", *ce.documentClassifier.DocumentClassifierArn, *ce.documentClassifier.Status)
+			logrus.Infof(
+				"ComprehendDocumentClassifier already deleting arn=%s status=%s",
+				*ce.documentClassifier.DocumentClassifierArn,
+				*ce.documentClassifier.Status,
+			)
 			return nil
 		}
 	}

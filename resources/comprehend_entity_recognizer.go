@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -50,7 +50,11 @@ func (ce *ComprehendEntityRecognizer) Remove() error {
 		fallthrough
 	case "TRAINED":
 		{
-			logrus.Infof("ComprehendEntityRecognizer deleteEntityRecognizer arn=%s status=%s", *ce.entityRecognizer.EntityRecognizerArn, *ce.entityRecognizer.Status)
+			logrus.Infof(
+				"ComprehendEntityRecognizer deleteEntityRecognizer arn=%s status=%s",
+				*ce.entityRecognizer.EntityRecognizerArn,
+				*ce.entityRecognizer.Status,
+			)
 			_, err := ce.svc.DeleteEntityRecognizer(&comprehend.DeleteEntityRecognizerInput{
 				EntityRecognizerArn: ce.entityRecognizer.EntityRecognizerArn,
 			})
@@ -60,15 +64,25 @@ func (ce *ComprehendEntityRecognizer) Remove() error {
 		fallthrough
 	case "TRAINING":
 		{
-			logrus.Infof("ComprehendEntityRecognizer stopTrainingEntityRecognizer arn=%s status=%s", *ce.entityRecognizer.EntityRecognizerArn, *ce.entityRecognizer.Status)
-			_, err := ce.svc.StopTrainingEntityRecognizer(&comprehend.StopTrainingEntityRecognizerInput{
-				EntityRecognizerArn: ce.entityRecognizer.EntityRecognizerArn,
-			})
+			logrus.Infof(
+				"ComprehendEntityRecognizer stopTrainingEntityRecognizer arn=%s status=%s",
+				*ce.entityRecognizer.EntityRecognizerArn,
+				*ce.entityRecognizer.Status,
+			)
+			_, err := ce.svc.StopTrainingEntityRecognizer(
+				&comprehend.StopTrainingEntityRecognizerInput{
+					EntityRecognizerArn: ce.entityRecognizer.EntityRecognizerArn,
+				},
+			)
 			return err
 		}
 	default:
 		{
-			logrus.Infof("ComprehendEntityRecognizer already deleting arn=%s status=%s", *ce.entityRecognizer.EntityRecognizerArn, *ce.entityRecognizer.Status)
+			logrus.Infof(
+				"ComprehendEntityRecognizer already deleting arn=%s status=%s",
+				*ce.entityRecognizer.EntityRecognizerArn,
+				*ce.entityRecognizer.Status,
+			)
 			return nil
 		}
 	}

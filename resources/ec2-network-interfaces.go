@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type EC2NetworkInterface struct {
@@ -48,7 +48,10 @@ func (e *EC2NetworkInterface) Remove() error {
 		})
 		if err != nil {
 			if e.eni.Attachment.AttachmentId != nil {
-				expected := fmt.Sprintf("The interface attachment '%s' does not exist.", *e.eni.Attachment.AttachmentId)
+				expected := fmt.Sprintf(
+					"The interface attachment '%s' does not exist.",
+					*e.eni.Attachment.AttachmentId,
+				)
 				if !strings.Contains(err.Error(), expected) {
 					return err
 				}

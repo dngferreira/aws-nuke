@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/rds"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type RDSInstance struct {
@@ -56,7 +56,8 @@ func (i *RDSInstance) FeatureFlags(ff config.FeatureFlags) {
 }
 
 func (i *RDSInstance) Remove() error {
-	if aws.BoolValue(i.instance.DeletionProtection) && i.featureFlags.DisableDeletionProtection.RDSInstance {
+	if aws.BoolValue(i.instance.DeletionProtection) &&
+		i.featureFlags.DisableDeletionProtection.RDSInstance {
 		modifyParams := &rds.ModifyDBInstanceInput{
 			DBInstanceIdentifier: i.instance.DBInstanceIdentifier,
 			DeletionProtection:   aws.Bool(false),

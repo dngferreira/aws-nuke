@@ -10,8 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -70,16 +70,29 @@ func (cfs *CloudFormationStack) Remove() error {
 
 func (cfs *CloudFormationStack) removeWithAttempts(attempt int) error {
 	if err := cfs.doRemove(); err != nil {
-		logrus.Errorf("CloudFormationStack stackName=%s attempt=%d maxAttempts=%d delete failed: %s", *cfs.stack.StackName, attempt, cfs.maxDeleteAttempts, err.Error())
+		logrus.Errorf(
+			"CloudFormationStack stackName=%s attempt=%d maxAttempts=%d delete failed: %s",
+			*cfs.stack.StackName,
+			attempt,
+			cfs.maxDeleteAttempts,
+			err.Error(),
+		)
 		awsErr, ok := err.(awserr.Error)
 		if ok && awsErr.Code() == "ValidationError" &&
 			awsErr.Message() == "Stack ["+*cfs.stack.StackName+"] cannot be deleted while TerminationProtection is enabled" {
 			if cfs.featureFlags.DisableDeletionProtection.CloudformationStack {
-				logrus.Infof("CloudFormationStack stackName=%s attempt=%d maxAttempts=%d updating termination protection", *cfs.stack.StackName, attempt, cfs.maxDeleteAttempts)
-				_, err = cfs.svc.UpdateTerminationProtection(&cloudformation.UpdateTerminationProtectionInput{
-					EnableTerminationProtection: aws.Bool(false),
-					StackName:                   cfs.stack.StackName,
-				})
+				logrus.Infof(
+					"CloudFormationStack stackName=%s attempt=%d maxAttempts=%d updating termination protection",
+					*cfs.stack.StackName,
+					attempt,
+					cfs.maxDeleteAttempts,
+				)
+				_, err = cfs.svc.UpdateTerminationProtection(
+					&cloudformation.UpdateTerminationProtectionInput{
+						EnableTerminationProtection: aws.Bool(false),
+						StackName:                   cfs.stack.StackName,
+					},
+				)
 				if err != nil {
 					return err
 				}
@@ -104,8 +117,12 @@ func (cfs *CloudFormationStack) doRemove() error {
 	})
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
-			if awsErr.Code() == "ValidationFailed" && strings.HasSuffix(awsErr.Message(), " does not exist") {
-				logrus.Infof("CloudFormationStack stackName=%s no longer exists", *cfs.stack.StackName)
+			if awsErr.Code() == "ValidationFailed" &&
+				strings.HasSuffix(awsErr.Message(), " does not exist") {
+				logrus.Infof(
+					"CloudFormationStack stackName=%s no longer exists",
+					*cfs.stack.StackName,
+				)
 				return nil
 			}
 		}
@@ -173,14 +190,20 @@ func (cfs *CloudFormationStack) waitForStackToStabilize(currentStatus string) er
 	case cloudformation.StackStatusUpdateRollbackCompleteCleanupInProgress:
 		fallthrough
 	case cloudformation.StackStatusUpdateRollbackInProgress:
-		logrus.Infof("CloudFormationStack stackName=%s update in progress. Waiting to stabalize", *cfs.stack.StackName)
+		logrus.Infof(
+			"CloudFormationStack stackName=%s update in progress. Waiting to stabalize",
+			*cfs.stack.StackName,
+		)
 		return cfs.svc.WaitUntilStackUpdateComplete(&cloudformation.DescribeStacksInput{
 			StackName: cfs.stack.StackName,
 		})
 	case cloudformation.StackStatusCreateInProgress:
 		fallthrough
 	case cloudformation.StackStatusRollbackInProgress:
-		logrus.Infof("CloudFormationStack stackName=%s create in progress. Waiting to stabalize", *cfs.stack.StackName)
+		logrus.Infof(
+			"CloudFormationStack stackName=%s create in progress. Waiting to stabalize",
+			*cfs.stack.StackName,
+		)
 		return cfs.svc.WaitUntilStackCreateComplete(&cloudformation.DescribeStacksInput{
 			StackName: cfs.stack.StackName,
 		})

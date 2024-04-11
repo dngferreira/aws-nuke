@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,17 +36,20 @@ func ListAppConfigConfigurationProfiles(sess *session.Session) ([]Resource, erro
 			ApplicationId: application.id,
 			MaxResults:    aws.Int64(50),
 		}
-		err := svc.ListConfigurationProfilesPages(params, func(page *appconfig.ListConfigurationProfilesOutput, lastPage bool) bool {
-			for _, item := range page.Items {
-				resources = append(resources, &AppConfigConfigurationProfile{
-					svc:           svc,
-					applicationId: application.id,
-					id:            item.Id,
-					name:          item.Name,
-				})
-			}
-			return true
-		})
+		err := svc.ListConfigurationProfilesPages(
+			params,
+			func(page *appconfig.ListConfigurationProfilesOutput, lastPage bool) bool {
+				for _, item := range page.Items {
+					resources = append(resources, &AppConfigConfigurationProfile{
+						svc:           svc,
+						applicationId: application.id,
+						id:            item.Id,
+						name:          item.Name,
+					})
+				}
+				return true
+			},
+		)
 		if err != nil {
 			return nil, err
 		}

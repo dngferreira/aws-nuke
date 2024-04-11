@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/codestarnotifications"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type CodeStarNotificationRule struct {
@@ -36,9 +36,11 @@ func ListCodeStarNotificationRules(sess *session.Session) ([]Resource, error) {
 		}
 
 		for _, notification := range output.NotificationRules {
-			descOutput, err := svc.DescribeNotificationRule(&codestarnotifications.DescribeNotificationRuleInput{
-				Arn: notification.Arn,
-			})
+			descOutput, err := svc.DescribeNotificationRule(
+				&codestarnotifications.DescribeNotificationRuleInput{
+					Arn: notification.Arn,
+				},
+			)
 			if err != nil {
 				return nil, err
 			}

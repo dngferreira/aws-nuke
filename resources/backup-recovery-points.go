@@ -2,9 +2,10 @@ package resources
 
 import (
 	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/backup"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type BackupRecoveryPoint struct {
@@ -30,7 +31,9 @@ func ListBackupRecoveryPoints(sess *session.Session) ([]Resource, error) {
 
 	resources := make([]Resource, 0)
 	for _, out := range resp.BackupVaultList {
-		recoveryPointsOutput, _ := svc.ListRecoveryPointsByBackupVault(&backup.ListRecoveryPointsByBackupVaultInput{BackupVaultName: out.BackupVaultName})
+		recoveryPointsOutput, _ := svc.ListRecoveryPointsByBackupVault(
+			&backup.ListRecoveryPointsByBackupVaultInput{BackupVaultName: out.BackupVaultName},
+		)
 		for _, rp := range recoveryPointsOutput.RecoveryPoints {
 			resources = append(resources, &BackupRecoveryPoint{
 				svc:             svc,

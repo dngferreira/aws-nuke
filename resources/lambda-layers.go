@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/lambda"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type lambdaLayer struct {
@@ -39,16 +39,19 @@ func ListLambdaLayers(sess *session.Session) ([]Resource, error) {
 		versionsParams := &lambda.ListLayerVersionsInput{
 			LayerName: layer.LayerName,
 		}
-		err := svc.ListLayerVersionsPages(versionsParams, func(page *lambda.ListLayerVersionsOutput, lastPage bool) bool {
-			for _, out := range page.LayerVersions {
-				resources = append(resources, &lambdaLayer{
-					svc:       svc,
-					layerName: layer.LayerName,
-					version:   *out.Version,
-				})
-			}
-			return true
-		})
+		err := svc.ListLayerVersionsPages(
+			versionsParams,
+			func(page *lambda.ListLayerVersionsOutput, lastPage bool) bool {
+				for _, out := range page.LayerVersions {
+					resources = append(resources, &lambdaLayer{
+						svc:       svc,
+						layerName: layer.LayerName,
+						version:   *out.Version,
+					})
+				}
+				return true
+			},
+		)
 		if err != nil {
 			return nil, err
 		}

@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/costandusagereportservice"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func init() {
@@ -26,12 +26,15 @@ func ListBillingCostandUsageReports(sess *session.Session) ([]Resource, error) {
 	}
 
 	reports := make([]*costandusagereportservice.ReportDefinition, 0)
-	err := svc.DescribeReportDefinitionsPages(params, func(page *costandusagereportservice.DescribeReportDefinitionsOutput, lastPage bool) bool {
-		for _, out := range page.ReportDefinitions {
-			reports = append(reports, out)
-		}
-		return true
-	})
+	err := svc.DescribeReportDefinitionsPages(
+		params,
+		func(page *costandusagereportservice.DescribeReportDefinitionsOutput, lastPage bool) bool {
+			for _, out := range page.ReportDefinitions {
+				reports = append(reports, out)
+			}
+			return true
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

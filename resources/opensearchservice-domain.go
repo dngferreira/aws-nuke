@@ -5,7 +5,7 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/opensearchservice"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type OSDomain struct {
@@ -47,7 +47,9 @@ func ListOSDomains(sess *session.Session) ([]Resource, error) {
 	}
 
 	for _, domain := range descResp.DomainStatusList {
-		configResp, err := svc.DescribeDomainConfig(&opensearchservice.DescribeDomainConfigInput{DomainName: domain.DomainName})
+		configResp, err := svc.DescribeDomainConfig(
+			&opensearchservice.DescribeDomainConfigInput{DomainName: domain.DomainName},
+		)
 		if err != nil {
 			return nil, err
 		}

@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/imagebuilder"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type ImageBuilderImage struct {
@@ -45,7 +45,11 @@ func ListImageBuilderImages(sess *session.Session) ([]Resource, error) {
 	return resources, nil
 }
 
-func ImageBuildVersions(svc *imagebuilder.Imagebuilder, imageVersionArn *string, resources []Resource) ([]Resource, error) {
+func ImageBuildVersions(
+	svc *imagebuilder.Imagebuilder,
+	imageVersionArn *string,
+	resources []Resource,
+) ([]Resource, error) {
 	params := &imagebuilder.ListImageBuildVersionsInput{
 		ImageVersionArn: imageVersionArn,
 	}

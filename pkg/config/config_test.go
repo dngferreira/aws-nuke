@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func TestConfigBlocklist(t *testing.T) {
@@ -193,7 +193,8 @@ func TestResolveDeprecations(t *testing.T) {
 	}
 
 	err = invalidConfig.resolveDeprecations()
-	if err == nil || !strings.Contains(err.Error(), "using deprecated resource type and replacement") {
+	if err == nil ||
+		!strings.Contains(err.Error(), "using deprecated resource type and replacement") {
 		t.Fatal("invalid config did not cause correct error")
 	}
 }
@@ -238,7 +239,9 @@ func TestDeprecatedConfigKeys(t *testing.T) {
 	}
 
 	if !config.InBlocklist("1234567890") {
-		t.Errorf("Loading the config did not resolve the deprecated key 'account-blacklist' correctly")
+		t.Errorf(
+			"Loading the config did not resolve the deprecated key 'account-blacklist' correctly",
+		)
 	}
 }
 

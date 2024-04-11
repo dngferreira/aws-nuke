@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type Route53ResourceRecordSet struct {
@@ -45,7 +45,11 @@ func ListRoute53ResourceRecordSets(sess *session.Session) ([]Resource, error) {
 	return resources, nil
 }
 
-func ListResourceRecordsForZone(svc *route53.Route53, zoneId *string, zoneName *string) ([]Resource, error) {
+func ListResourceRecordsForZone(
+	svc *route53.Route53,
+	zoneId *string,
+	zoneName *string,
+) ([]Resource, error) {
 	params := &route53.ListResourceRecordSetsInput{
 		HostedZoneId: zoneId,
 	}

@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/servicecatalog"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -20,7 +20,10 @@ type ServiceCatalogTagOptionPortfolioAttachment struct {
 }
 
 func init() {
-	register("ServiceCatalogTagOptionPortfolioAttachment", ListServiceCatalogTagOptionPortfolioAttachments)
+	register(
+		"ServiceCatalogTagOptionPortfolioAttachment",
+		ListServiceCatalogTagOptionPortfolioAttachments,
+	)
 }
 
 func ListServiceCatalogTagOptionPortfolioAttachments(sess *session.Session) ([]Resource, error) {
@@ -89,10 +92,12 @@ func ListServiceCatalogTagOptionPortfolioAttachments(sess *session.Session) ([]R
 
 func (f *ServiceCatalogTagOptionPortfolioAttachment) Remove() error {
 
-	_, err := f.svc.DisassociateTagOptionFromResource(&servicecatalog.DisassociateTagOptionFromResourceInput{
-		TagOptionId: f.tagOptionID,
-		ResourceId:  f.resourceID,
-	})
+	_, err := f.svc.DisassociateTagOptionFromResource(
+		&servicecatalog.DisassociateTagOptionFromResourceInput{
+			TagOptionId: f.tagOptionID,
+			ResourceId:  f.resourceID,
+		},
+	)
 
 	return err
 }

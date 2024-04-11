@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/dngferreira/aws-nuke/v2/mocks/mock_cloudformationiface"
 	"github.com/golang/mock/gomock"
-	"github.com/rebuy-de/aws-nuke/v2/mocks/mock_cloudformationiface"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,29 +85,33 @@ func TestCloudformationStack_Remove_DeleteFailed(t *testing.T) {
 				},
 			},
 		}, nil),
-		mockCloudformation.EXPECT().ListStackResources(gomock.Eq(&cloudformation.ListStackResourcesInput{
-			StackName: aws.String("foobar"),
-		})).Return(&cloudformation.ListStackResourcesOutput{
-			StackResourceSummaries: []*cloudformation.StackResourceSummary{
-				{
-					ResourceStatus:    aws.String(cloudformation.ResourceStatusDeleteComplete),
-					LogicalResourceId: aws.String("fooDeleteComplete"),
+		mockCloudformation.EXPECT().
+			ListStackResources(gomock.Eq(&cloudformation.ListStackResourcesInput{
+				StackName: aws.String("foobar"),
+			})).
+			Return(&cloudformation.ListStackResourcesOutput{
+				StackResourceSummaries: []*cloudformation.StackResourceSummary{
+					{
+						ResourceStatus:    aws.String(cloudformation.ResourceStatusDeleteComplete),
+						LogicalResourceId: aws.String("fooDeleteComplete"),
+					},
+					{
+						ResourceStatus:    aws.String(cloudformation.ResourceStatusDeleteFailed),
+						LogicalResourceId: aws.String("fooDeleteFailed"),
+					},
 				},
-				{
-					ResourceStatus:    aws.String(cloudformation.ResourceStatusDeleteFailed),
-					LogicalResourceId: aws.String("fooDeleteFailed"),
-				},
-			},
-		}, nil),
+			}, nil),
 		mockCloudformation.EXPECT().DeleteStack(gomock.Eq(&cloudformation.DeleteStackInput{
 			StackName: aws.String("foobar"),
 			RetainResources: []*string{
 				aws.String("fooDeleteFailed"),
 			},
 		})).Return(nil, nil),
-		mockCloudformation.EXPECT().WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-			StackName: aws.String("foobar"),
-		})).Return(nil),
+		mockCloudformation.EXPECT().
+			WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+				StackName: aws.String("foobar"),
+			})).
+			Return(nil),
 	)
 
 	err := stack.Remove()
@@ -140,9 +144,11 @@ func TestCloudformationStack_Remove_DeleteInProgress(t *testing.T) {
 			},
 		}, nil),
 
-		mockCloudformation.EXPECT().WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-			StackName: aws.String("foobar"),
-		})).Return(nil),
+		mockCloudformation.EXPECT().
+			WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+				StackName: aws.String("foobar"),
+			})).
+			Return(nil),
 	)
 
 	err := stack.Remove()
@@ -177,23 +183,27 @@ func TestCloudformationStack_Remove_Stack_InCompletedStatus(t *testing.T) {
 			}
 
 			gomock.InOrder(
-				mockCloudformation.EXPECT().DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(&cloudformation.DescribeStacksOutput{
-					Stacks: []*cloudformation.Stack{
-						{
-							StackStatus: aws.String(stackStatus),
+				mockCloudformation.EXPECT().
+					DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(&cloudformation.DescribeStacksOutput{
+						Stacks: []*cloudformation.Stack{
+							{
+								StackStatus: aws.String(stackStatus),
+							},
 						},
-					},
-				}, nil),
+					}, nil),
 
 				mockCloudformation.EXPECT().DeleteStack(gomock.Eq(&cloudformation.DeleteStackInput{
 					StackName: aws.String("foobar"),
 				})).Return(nil, nil),
 
-				mockCloudformation.EXPECT().WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(nil),
+				mockCloudformation.EXPECT().
+					WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(nil),
 			)
 
 			err := stack.Remove()
@@ -224,27 +234,33 @@ func TestCloudformationStack_Remove_Stack_CreateInProgress(t *testing.T) {
 			}
 
 			gomock.InOrder(
-				mockCloudformation.EXPECT().DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(&cloudformation.DescribeStacksOutput{
-					Stacks: []*cloudformation.Stack{
-						{
-							StackStatus: aws.String(stackStatus),
+				mockCloudformation.EXPECT().
+					DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(&cloudformation.DescribeStacksOutput{
+						Stacks: []*cloudformation.Stack{
+							{
+								StackStatus: aws.String(stackStatus),
+							},
 						},
-					},
-				}, nil),
+					}, nil),
 
-				mockCloudformation.EXPECT().WaitUntilStackCreateComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(nil),
+				mockCloudformation.EXPECT().
+					WaitUntilStackCreateComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(nil),
 
 				mockCloudformation.EXPECT().DeleteStack(gomock.Eq(&cloudformation.DeleteStackInput{
 					StackName: aws.String("foobar"),
 				})).Return(nil, nil),
 
-				mockCloudformation.EXPECT().WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(nil),
+				mockCloudformation.EXPECT().
+					WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(nil),
 			)
 
 			err := stack.Remove()
@@ -276,27 +292,33 @@ func TestCloudformationStack_Remove_Stack_UpdateInProgress(t *testing.T) {
 			}
 
 			gomock.InOrder(
-				mockCloudformation.EXPECT().DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(&cloudformation.DescribeStacksOutput{
-					Stacks: []*cloudformation.Stack{
-						{
-							StackStatus: aws.String(stackStatus),
+				mockCloudformation.EXPECT().
+					DescribeStacks(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(&cloudformation.DescribeStacksOutput{
+						Stacks: []*cloudformation.Stack{
+							{
+								StackStatus: aws.String(stackStatus),
+							},
 						},
-					},
-				}, nil),
+					}, nil),
 
-				mockCloudformation.EXPECT().WaitUntilStackUpdateComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(nil),
+				mockCloudformation.EXPECT().
+					WaitUntilStackUpdateComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(nil),
 
 				mockCloudformation.EXPECT().DeleteStack(gomock.Eq(&cloudformation.DeleteStackInput{
 					StackName: aws.String("foobar"),
 				})).Return(nil, nil),
 
-				mockCloudformation.EXPECT().WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
-					StackName: aws.String("foobar"),
-				})).Return(nil),
+				mockCloudformation.EXPECT().
+					WaitUntilStackDeleteComplete(gomock.Eq(&cloudformation.DescribeStacksInput{
+						StackName: aws.String("foobar"),
+					})).
+					Return(nil),
 			)
 
 			err := stack.Remove()

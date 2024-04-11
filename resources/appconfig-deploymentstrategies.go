@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/appconfig"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type AppConfigDeploymentStrategy struct {
@@ -26,16 +26,19 @@ func ListAppConfigDeploymentStrategies(sess *session.Session) ([]Resource, error
 	params := &appconfig.ListDeploymentStrategiesInput{
 		MaxResults: aws.Int64(50),
 	}
-	err := svc.ListDeploymentStrategiesPages(params, func(page *appconfig.ListDeploymentStrategiesOutput, lastPage bool) bool {
-		for _, item := range page.Items {
-			resources = append(resources, &AppConfigDeploymentStrategy{
-				svc:  svc,
-				id:   item.Id,
-				name: item.Name,
-			})
-		}
-		return true
-	})
+	err := svc.ListDeploymentStrategiesPages(
+		params,
+		func(page *appconfig.ListDeploymentStrategiesOutput, lastPage bool) bool {
+			for _, item := range page.Items {
+				resources = append(resources, &AppConfigDeploymentStrategy{
+					svc:  svc,
+					id:   item.Id,
+					name: item.Name,
+				})
+			}
+			return true
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-module github.com/rebuy-de/aws-nuke/v2
+module github.com/dngferreira/aws-nuke/v2
 
 go 1.21
 

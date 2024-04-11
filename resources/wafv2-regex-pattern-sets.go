@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/wafv2"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type WAFv2RegexPatternSet struct {
@@ -50,7 +50,10 @@ func ListWAFv2RegexPatternSets(sess *session.Session) ([]Resource, error) {
 	return resources, nil
 }
 
-func getRegexPatternSets(svc *wafv2.WAFV2, params *wafv2.ListRegexPatternSetsInput) ([]Resource, error) {
+func getRegexPatternSets(
+	svc *wafv2.WAFV2,
+	params *wafv2.ListRegexPatternSetsInput,
+) ([]Resource, error) {
 	resources := []Resource{}
 	for {
 		resp, err := svc.ListRegexPatternSets(params)

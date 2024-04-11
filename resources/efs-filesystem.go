@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/efs"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type EFSFileSystem struct {
@@ -27,7 +27,9 @@ func ListEFSFileSystems(sess *session.Session) ([]Resource, error) {
 
 	resources := make([]Resource, 0)
 	for _, fs := range resp.FileSystems {
-		lto, err := svc.ListTagsForResource(&efs.ListTagsForResourceInput{ResourceId: fs.FileSystemId})
+		lto, err := svc.ListTagsForResource(
+			&efs.ListTagsForResourceInput{ResourceId: fs.FileSystemId},
+		)
 		if err != nil {
 			return nil, err
 		}

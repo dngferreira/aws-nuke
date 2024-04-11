@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/guardduty"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type GuardDutyDetector struct {
@@ -22,15 +22,18 @@ func ListGuardDutyDetectors(sess *session.Session) ([]Resource, error) {
 
 	params := &guardduty.ListDetectorsInput{}
 
-	err := svc.ListDetectorsPages(params, func(page *guardduty.ListDetectorsOutput, lastPage bool) bool {
-		for _, out := range page.DetectorIds {
-			detectors = append(detectors, &GuardDutyDetector{
-				svc: svc,
-				id:  out,
-			})
-		}
-		return true
-	})
+	err := svc.ListDetectorsPages(
+		params,
+		func(page *guardduty.ListDetectorsOutput, lastPage bool) bool {
+			for _, out := range page.DetectorIds {
+				detectors = append(detectors, &GuardDutyDetector{
+					svc: svc,
+					id:  out,
+				})
+			}
+			return true
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

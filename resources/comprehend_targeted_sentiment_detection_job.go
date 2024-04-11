@@ -3,11 +3,14 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func init() {
-	register("ComprehendTargetedSentimentDetectionJob", ListComprehendTargetedSentimentDetectionJobs)
+	register(
+		"ComprehendTargetedSentimentDetectionJob",
+		ListComprehendTargetedSentimentDetectionJobs,
+	)
 }
 
 func ListComprehendTargetedSentimentDetectionJobs(sess *session.Session) ([]Resource, error) {
@@ -49,9 +52,11 @@ type ComprehendTargetedSentimentDetectionJob struct {
 }
 
 func (ce *ComprehendTargetedSentimentDetectionJob) Remove() error {
-	_, err := ce.svc.StopTargetedSentimentDetectionJob(&comprehend.StopTargetedSentimentDetectionJobInput{
-		JobId: ce.targetedSentimentDetectionJob.JobId,
-	})
+	_, err := ce.svc.StopTargetedSentimentDetectionJob(
+		&comprehend.StopTargetedSentimentDetectionJobInput{
+			JobId: ce.targetedSentimentDetectionJob.JobId,
+		},
+	)
 	return err
 }
 

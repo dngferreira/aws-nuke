@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/awsutil"
+	"github.com/dngferreira/aws-nuke/v2/pkg/awsutil"
 )
 
 // SessionFactory support for custom endpoints
@@ -23,7 +23,11 @@ type Region struct {
 	lock  *sync.RWMutex
 }
 
-func NewRegion(name string, typeResolver ResourceTypeResolver, sessionFactory SessionFactory) *Region {
+func NewRegion(
+	name string,
+	typeResolver ResourceTypeResolver,
+	sessionFactory SessionFactory,
+) *Region {
 	return &Region{
 		Name:            name,
 		NewSession:      sessionFactory,

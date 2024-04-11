@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
@@ -98,7 +98,9 @@ func (c *Nuke) ResolveBlocklist() []string {
 		return c.AccountBlocklist
 	}
 
-	log.Warn("deprecated configuration key 'account-blacklist' - please use 'account-blocklist' instead")
+	log.Warn(
+		"deprecated configuration key 'account-blacklist' - please use 'account-blocklist' instead",
+	)
 	return c.AccountBlacklist
 }
 
@@ -211,10 +213,18 @@ func (c *Nuke) resolveDeprecations() error {
 			if !ok {
 				continue
 			}
-			log.Warnf("deprecated resource type '%s' - converting to '%s'\n", resourceType, replacement)
+			log.Warnf(
+				"deprecated resource type '%s' - converting to '%s'\n",
+				resourceType,
+				replacement,
+			)
 
 			if _, ok := a.Filters[replacement]; ok {
-				return fmt.Errorf("using deprecated resource type and replacement: '%s','%s'", resourceType, replacement)
+				return fmt.Errorf(
+					"using deprecated resource type and replacement: '%s','%s'",
+					resourceType,
+					replacement,
+				)
 			}
 
 			a.Filters[replacement] = resources

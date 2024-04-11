@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/signer"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type SignerSigningJob struct {
@@ -35,24 +35,27 @@ func ListSignerSigningJobs(sess *session.Session) ([]Resource, error) {
 
 	listJobsInput := &signer.ListSigningJobsInput{}
 
-	err := svc.ListSigningJobsPages(listJobsInput, func(page *signer.ListSigningJobsOutput, lastPage bool) bool {
-		for _, job := range page.Jobs {
-			resources = append(resources, &SignerSigningJob{
-				svc:                 svc,
-				jobId:               job.JobId,
-				reason:              reason,
-				isRevoked:           job.IsRevoked,
-				createdAt:           *job.CreatedAt,
-				profileName:         job.ProfileName,
-				profileVersion:      job.ProfileVersion,
-				platformId:          job.PlatformId,
-				platformDisplayName: job.PlatformDisplayName,
-				jobOwner:            job.JobOwner,
-				jobInvoker:          job.JobInvoker,
-			})
-		}
-		return true // continue iterating over pages
-	})
+	err := svc.ListSigningJobsPages(
+		listJobsInput,
+		func(page *signer.ListSigningJobsOutput, lastPage bool) bool {
+			for _, job := range page.Jobs {
+				resources = append(resources, &SignerSigningJob{
+					svc:                 svc,
+					jobId:               job.JobId,
+					reason:              reason,
+					isRevoked:           job.IsRevoked,
+					createdAt:           *job.CreatedAt,
+					profileName:         job.ProfileName,
+					profileVersion:      job.ProfileVersion,
+					platformId:          job.PlatformId,
+					platformDisplayName: job.PlatformDisplayName,
+					jobOwner:            job.JobOwner,
+					jobInvoker:          job.JobInvoker,
+				})
+			}
+			return true // continue iterating over pages
+		},
+	)
 	if err != nil {
 		return nil, err
 	}

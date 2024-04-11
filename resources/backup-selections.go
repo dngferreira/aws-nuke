@@ -2,10 +2,11 @@ package resources
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/backup"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
-	"strings"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type BackupSelection struct {
@@ -36,7 +37,9 @@ func ListBackupSelections(sess *session.Session) ([]Resource, error) {
 		}
 
 		for _, plan := range output.BackupPlansList {
-			selectionsOutput, _ := svc.ListBackupSelections(&backup.ListBackupSelectionsInput{BackupPlanId: plan.BackupPlanId})
+			selectionsOutput, _ := svc.ListBackupSelections(
+				&backup.ListBackupSelectionsInput{BackupPlanId: plan.BackupPlanId},
+			)
 			for _, selection := range selectionsOutput.BackupSelectionsList {
 				resources = append(resources, &BackupSelection{
 					svc:           svc,

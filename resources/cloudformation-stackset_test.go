@@ -5,8 +5,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
+	"github.com/dngferreira/aws-nuke/v2/mocks/mock_cloudformationiface"
 	"github.com/golang/mock/gomock"
-	"github.com/rebuy-de/aws-nuke/v2/mocks/mock_cloudformationiface"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,29 +24,33 @@ func TestCloudformationStackSet_Remove(t *testing.T) {
 		},
 	}
 
-	mockCloudformation.EXPECT().ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.ListStackInstancesOutput{
-		Summaries: []*cloudformation.StackInstanceSummary{
-			{
-				Account: aws.String("a1"),
-				Region:  aws.String("r1"),
+	mockCloudformation.EXPECT().
+		ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.ListStackInstancesOutput{
+			Summaries: []*cloudformation.StackInstanceSummary{
+				{
+					Account: aws.String("a1"),
+					Region:  aws.String("r1"),
+				},
+				{
+					Account: aws.String("a1"),
+					Region:  aws.String("r2"),
+				},
 			},
-			{
-				Account: aws.String("a1"),
-				Region:  aws.String("r2"),
-			},
-		},
-	}, nil)
+		}, nil)
 
-	mockCloudformation.EXPECT().DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-		Accounts:     []*string{aws.String("a1")},
-		Regions:      []*string{aws.String("r1"), aws.String("r2")},
-		RetainStacks: aws.Bool(true),
-	})).Return(&cloudformation.DeleteStackInstancesOutput{
-		OperationId: aws.String("o1"),
-	}, nil)
+	mockCloudformation.EXPECT().
+		DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+			Accounts:     []*string{aws.String("a1")},
+			Regions:      []*string{aws.String("r1"), aws.String("r2")},
+			RetainStacks: aws.Bool(true),
+		})).
+		Return(&cloudformation.DeleteStackInstancesOutput{
+			OperationId: aws.String("o1"),
+		}, nil)
 
 	describeStackSetStatuses := []string{
 		cloudformation.StackSetOperationResultStatusPending,
@@ -55,14 +59,16 @@ func TestCloudformationStackSet_Remove(t *testing.T) {
 	}
 	describeStackSetOperationCalls := make([]*gomock.Call, len(describeStackSetStatuses))
 	for i, status := range describeStackSetStatuses {
-		describeStackSetOperationCalls[i] = mockCloudformation.EXPECT().DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
-			OperationId:  aws.String("o1"),
-			StackSetName: aws.String("foobar"),
-		})).Return(&cloudformation.DescribeStackSetOperationOutput{
-			StackSetOperation: &cloudformation.StackSetOperation{
-				Status: aws.String(status),
-			},
-		}, nil)
+		describeStackSetOperationCalls[i] = mockCloudformation.EXPECT().
+			DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
+				OperationId:  aws.String("o1"),
+				StackSetName: aws.String("foobar"),
+			})).
+			Return(&cloudformation.DescribeStackSetOperationOutput{
+				StackSetOperation: &cloudformation.StackSetOperation{
+					Status: aws.String(status),
+				},
+			}, nil)
 	}
 	gomock.InOrder(describeStackSetOperationCalls...)
 
@@ -88,58 +94,68 @@ func TestCloudformationStackSet_Remove_MultipleAccounts(t *testing.T) {
 		},
 	}
 
-	mockCloudformation.EXPECT().ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.ListStackInstancesOutput{
-		Summaries: []*cloudformation.StackInstanceSummary{
-			{
-				Account: aws.String("a1"),
-				Region:  aws.String("r1"),
+	mockCloudformation.EXPECT().
+		ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.ListStackInstancesOutput{
+			Summaries: []*cloudformation.StackInstanceSummary{
+				{
+					Account: aws.String("a1"),
+					Region:  aws.String("r1"),
+				},
+				{
+					Account: aws.String("a1"),
+					Region:  aws.String("r2"),
+				},
+				{
+					Account: aws.String("a2"),
+					Region:  aws.String("r2"),
+				},
 			},
-			{
-				Account: aws.String("a1"),
-				Region:  aws.String("r2"),
-			},
-			{
-				Account: aws.String("a2"),
-				Region:  aws.String("r2"),
-			},
-		},
-	}, nil)
+		}, nil)
 
-	mockCloudformation.EXPECT().DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-		Accounts:     []*string{aws.String("a1")},
-		Regions:      []*string{aws.String("r1"), aws.String("r2")},
-		RetainStacks: aws.Bool(true),
-	})).Return(&cloudformation.DeleteStackInstancesOutput{
-		OperationId: aws.String("a1-oId"),
-	}, nil)
-	mockCloudformation.EXPECT().DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-		Accounts:     []*string{aws.String("a2")},
-		Regions:      []*string{aws.String("r2")},
-		RetainStacks: aws.Bool(true),
-	})).Return(&cloudformation.DeleteStackInstancesOutput{
-		OperationId: aws.String("a2-oId"),
-	}, nil)
+	mockCloudformation.EXPECT().
+		DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+			Accounts:     []*string{aws.String("a1")},
+			Regions:      []*string{aws.String("r1"), aws.String("r2")},
+			RetainStacks: aws.Bool(true),
+		})).
+		Return(&cloudformation.DeleteStackInstancesOutput{
+			OperationId: aws.String("a1-oId"),
+		}, nil)
+	mockCloudformation.EXPECT().
+		DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+			Accounts:     []*string{aws.String("a2")},
+			Regions:      []*string{aws.String("r2")},
+			RetainStacks: aws.Bool(true),
+		})).
+		Return(&cloudformation.DeleteStackInstancesOutput{
+			OperationId: aws.String("a2-oId"),
+		}, nil)
 
-	mockCloudformation.EXPECT().DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
-		OperationId:  aws.String("a1-oId"),
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.DescribeStackSetOperationOutput{
-		StackSetOperation: &cloudformation.StackSetOperation{
-			Status: aws.String(cloudformation.StackSetOperationResultStatusSucceeded),
-		},
-	}, nil)
-	mockCloudformation.EXPECT().DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
-		OperationId:  aws.String("a2-oId"),
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.DescribeStackSetOperationOutput{
-		StackSetOperation: &cloudformation.StackSetOperation{
-			Status: aws.String(cloudformation.StackSetOperationResultStatusSucceeded),
-		},
-	}, nil)
+	mockCloudformation.EXPECT().
+		DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
+			OperationId:  aws.String("a1-oId"),
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.DescribeStackSetOperationOutput{
+			StackSetOperation: &cloudformation.StackSetOperation{
+				Status: aws.String(cloudformation.StackSetOperationResultStatusSucceeded),
+			},
+		}, nil)
+	mockCloudformation.EXPECT().
+		DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
+			OperationId:  aws.String("a2-oId"),
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.DescribeStackSetOperationOutput{
+			StackSetOperation: &cloudformation.StackSetOperation{
+				Status: aws.String(cloudformation.StackSetOperationResultStatusSucceeded),
+			},
+		}, nil)
 
 	mockCloudformation.EXPECT().DeleteStackSet(gomock.Eq(&cloudformation.DeleteStackSetInput{
 		StackSetName: aws.String("foobar"),
@@ -163,34 +179,40 @@ func TestCloudformationStackSet_Remove_DeleteStackInstanceFailed(t *testing.T) {
 		},
 	}
 
-	mockCloudformation.EXPECT().ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.ListStackInstancesOutput{
-		Summaries: []*cloudformation.StackInstanceSummary{
-			{
-				Account: aws.String("a1"),
-				Region:  aws.String("r1"),
+	mockCloudformation.EXPECT().
+		ListStackInstances(gomock.Eq(&cloudformation.ListStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.ListStackInstancesOutput{
+			Summaries: []*cloudformation.StackInstanceSummary{
+				{
+					Account: aws.String("a1"),
+					Region:  aws.String("r1"),
+				},
 			},
-		},
-	}, nil)
+		}, nil)
 
-	mockCloudformation.EXPECT().DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
-		StackSetName: aws.String("foobar"),
-		Accounts:     []*string{aws.String("a1")},
-		Regions:      []*string{aws.String("r1")},
-		RetainStacks: aws.Bool(true),
-	})).Return(&cloudformation.DeleteStackInstancesOutput{
-		OperationId: aws.String("o1"),
-	}, nil)
+	mockCloudformation.EXPECT().
+		DeleteStackInstances(gomock.Eq(&cloudformation.DeleteStackInstancesInput{
+			StackSetName: aws.String("foobar"),
+			Accounts:     []*string{aws.String("a1")},
+			Regions:      []*string{aws.String("r1")},
+			RetainStacks: aws.Bool(true),
+		})).
+		Return(&cloudformation.DeleteStackInstancesOutput{
+			OperationId: aws.String("o1"),
+		}, nil)
 
-	mockCloudformation.EXPECT().DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
-		OperationId:  aws.String("o1"),
-		StackSetName: aws.String("foobar"),
-	})).Return(&cloudformation.DescribeStackSetOperationOutput{
-		StackSetOperation: &cloudformation.StackSetOperation{
-			Status: aws.String(cloudformation.StackSetOperationResultStatusFailed),
-		},
-	}, nil)
+	mockCloudformation.EXPECT().
+		DescribeStackSetOperation(gomock.Eq(&cloudformation.DescribeStackSetOperationInput{
+			OperationId:  aws.String("o1"),
+			StackSetName: aws.String("foobar"),
+		})).
+		Return(&cloudformation.DescribeStackSetOperationOutput{
+			StackSetOperation: &cloudformation.StackSetOperation{
+				Status: aws.String(cloudformation.StackSetOperationResultStatusFailed),
+			},
+		}, nil)
 
 	err := stackSet.Remove()
 	a.EqualError(err, "unable to delete stackSet=foobar operationId=o1 status=FAILED")

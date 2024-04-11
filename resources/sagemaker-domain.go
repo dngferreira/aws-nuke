@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sagemaker"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type SageMakerDomain struct {
@@ -49,8 +49,10 @@ func ListSageMakerDomains(sess *session.Session) ([]Resource, error) {
 
 func (f *SageMakerDomain) Remove() error {
 	_, err := f.svc.DeleteDomain(&sagemaker.DeleteDomainInput{
-		DomainId:        f.domainID,
-		RetentionPolicy: &sagemaker.RetentionPolicy{HomeEfsFileSystem: aws.String(sagemaker.RetentionTypeDelete)},
+		DomainId: f.domainID,
+		RetentionPolicy: &sagemaker.RetentionPolicy{
+			HomeEfsFileSystem: aws.String(sagemaker.RetentionTypeDelete),
+		},
 	})
 
 	return err

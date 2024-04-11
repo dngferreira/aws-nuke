@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudcontrolapi"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -49,31 +49,34 @@ func NewListCloudControlResource(typeName string) func(*session.Session) ([]Reso
 			TypeName: aws.String(typeName),
 		}
 		resources := make([]Resource, 0)
-		err := svc.ListResourcesPages(params, func(page *cloudcontrolapi.ListResourcesOutput, lastPage bool) bool {
-			for _, desc := range page.ResourceDescriptions {
-				identifier := aws.StringValue(desc.Identifier)
+		err := svc.ListResourcesPages(
+			params,
+			func(page *cloudcontrolapi.ListResourcesOutput, lastPage bool) bool {
+				for _, desc := range page.ResourceDescriptions {
+					identifier := aws.StringValue(desc.Identifier)
 
-				properties, err := cloudControlParseProperties(aws.StringValue(desc.Properties))
-				if err != nil {
-					logrus.
-						WithError(errors.WithStack(err)).
-						WithField("type-name", typeName).
-						WithField("identifier", identifier).
-						Error("failed to parse cloud control properties")
-					continue
+					properties, err := cloudControlParseProperties(aws.StringValue(desc.Properties))
+					if err != nil {
+						logrus.
+							WithError(errors.WithStack(err)).
+							WithField("type-name", typeName).
+							WithField("identifier", identifier).
+							Error("failed to parse cloud control properties")
+						continue
+					}
+					properties = properties.Set("Identifier", identifier)
+					resources = append(resources, &CloudControlResource{
+						svc:         svc,
+						clientToken: uuid.New().String(),
+						typeName:    typeName,
+						identifier:  identifier,
+						properties:  properties,
+					})
 				}
-				properties = properties.Set("Identifier", identifier)
-				resources = append(resources, &CloudControlResource{
-					svc:         svc,
-					clientToken: uuid.New().String(),
-					typeName:    typeName,
-					identifier:  identifier,
-					properties:  properties,
-				})
-			}
 
-			return true
-		})
+				return true
+			},
+		)
 
 		if err != nil {
 			return nil, err

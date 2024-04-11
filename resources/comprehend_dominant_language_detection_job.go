@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/comprehend"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func init() {
@@ -49,9 +49,11 @@ type ComprehendDominantLanguageDetectionJob struct {
 }
 
 func (ce *ComprehendDominantLanguageDetectionJob) Remove() error {
-	_, err := ce.svc.StopDominantLanguageDetectionJob(&comprehend.StopDominantLanguageDetectionJobInput{
-		JobId: ce.dominantLanguageDetectionJob.JobId,
-	})
+	_, err := ce.svc.StopDominantLanguageDetectionJob(
+		&comprehend.StopDominantLanguageDetectionJobInput{
+			JobId: ce.dominantLanguageDetectionJob.JobId,
+		},
+	)
 	return err
 }
 

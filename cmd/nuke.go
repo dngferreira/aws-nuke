@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rebuy-de/aws-nuke/v2/pkg/awsutil"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/config"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
-	"github.com/rebuy-de/aws-nuke/v2/resources"
+	"github.com/dngferreira/aws-nuke/v2/pkg/awsutil"
+	"github.com/dngferreira/aws-nuke/v2/pkg/config"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/resources"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,7 +34,9 @@ func (n *Nuke) Run() error {
 	var err error
 
 	if n.Parameters.ForceSleep < 3 && n.Parameters.NoDryRun {
-		return fmt.Errorf("Value for --force-sleep cannot be less than 3 seconds if --no-dry-run is set. This is for your own protection.")
+		return fmt.Errorf(
+			"Value for --force-sleep cannot be less than 3 seconds if --no-dry-run is set. This is for your own protection.",
+		)
 	}
 	forceSleep := time.Duration(n.Parameters.ForceSleep) * time.Second
 
@@ -69,7 +71,9 @@ func (n *Nuke) Run() error {
 	}
 
 	if !n.Parameters.NoDryRun {
-		fmt.Println("The above resources would be deleted with the supplied configuration. Provide --no-dry-run to actually destroy resources.")
+		fmt.Println(
+			"The above resources would be deleted with the supplied configuration. Provide --no-dry-run to actually destroy resources.",
+		)
 		return nil
 	}
 
@@ -92,9 +96,12 @@ func (n *Nuke) Run() error {
 	for {
 		n.HandleQueue()
 
-		if n.items.Count(ItemStatePending, ItemStateWaiting, ItemStateNew) == 0 && n.items.Count(ItemStateFailed) > 0 {
+		if n.items.Count(ItemStatePending, ItemStateWaiting, ItemStateNew) == 0 &&
+			n.items.Count(ItemStateFailed) > 0 {
 			if failCount >= 2 {
-				logrus.Errorf("There are resources in failed state, but none are ready for deletion, anymore.")
+				logrus.Errorf(
+					"There are resources in failed state, but none are ready for deletion, anymore.",
+				)
 				fmt.Println()
 
 				for _, item := range n.items {
@@ -113,9 +120,14 @@ func (n *Nuke) Run() error {
 		} else {
 			failCount = 0
 		}
-		if n.Parameters.MaxWaitRetries != 0 && n.items.Count(ItemStateWaiting, ItemStatePending) > 0 && n.items.Count(ItemStateNew) == 0 {
+		if n.Parameters.MaxWaitRetries != 0 &&
+			n.items.Count(ItemStateWaiting, ItemStatePending) > 0 &&
+			n.items.Count(ItemStateNew) == 0 {
 			if waitingCount >= n.Parameters.MaxWaitRetries {
-				return fmt.Errorf("Max wait retries of %d exceeded.\n\n", n.Parameters.MaxWaitRetries)
+				return fmt.Errorf(
+					"Max wait retries of %d exceeded.\n\n",
+					n.Parameters.MaxWaitRetries,
+				)
 			}
 			waitingCount = waitingCount + 1
 		} else {
@@ -128,8 +140,14 @@ func (n *Nuke) Run() error {
 		time.Sleep(5 * time.Second)
 	}
 
-	fmt.Printf("Nuke complete: %d failed, %d skipped, %d finished.\n\n",
-		n.items.Count(ItemStateFailed), n.items.Count(ItemStateFiltered), n.items.Count(ItemStateFinished))
+	fmt.Printf(
+		"Nuke complete: %d failed, %d skipped, %d finished.\n\n",
+		n.items.Count(
+			ItemStateFailed,
+		),
+		n.items.Count(ItemStateFiltered),
+		n.items.Count(ItemStateFinished),
+	)
 
 	return nil
 }

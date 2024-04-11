@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/servicecatalog"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 type ServiceCatalogPrincipalPortfolioAttachment struct {
@@ -17,7 +17,10 @@ type ServiceCatalogPrincipalPortfolioAttachment struct {
 }
 
 func init() {
-	register("ServiceCatalogPrincipalPortfolioAttachment", ListServiceCatalogPrincipalPortfolioAttachments)
+	register(
+		"ServiceCatalogPrincipalPortfolioAttachment",
+		ListServiceCatalogPrincipalPortfolioAttachments,
+	)
 }
 
 func ListServiceCatalogPrincipalPortfolioAttachments(sess *session.Session) ([]Resource, error) {
@@ -81,10 +84,12 @@ func ListServiceCatalogPrincipalPortfolioAttachments(sess *session.Session) ([]R
 
 func (f *ServiceCatalogPrincipalPortfolioAttachment) Remove() error {
 
-	_, err := f.svc.DisassociatePrincipalFromPortfolio(&servicecatalog.DisassociatePrincipalFromPortfolioInput{
-		PrincipalARN: f.principalARN,
-		PortfolioId:  f.portfolioID,
-	})
+	_, err := f.svc.DisassociatePrincipalFromPortfolio(
+		&servicecatalog.DisassociatePrincipalFromPortfolioInput{
+			PrincipalARN: f.principalARN,
+			PortfolioId:  f.portfolioID,
+		},
+	)
 
 	return err
 }

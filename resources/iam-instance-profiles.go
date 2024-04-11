@@ -3,7 +3,7 @@ package resources
 import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,7 +18,10 @@ func init() {
 	register("IAMInstanceProfile", ListIAMInstanceProfiles)
 }
 
-func GetIAMInstanceProfile(svc *iam.IAM, instanceProfileName *string) (*iam.InstanceProfile, error) {
+func GetIAMInstanceProfile(
+	svc *iam.IAM,
+	instanceProfileName *string,
+) (*iam.InstanceProfile, error) {
 	params := &iam.GetInstanceProfileInput{
 		InstanceProfileName: instanceProfileName,
 	}

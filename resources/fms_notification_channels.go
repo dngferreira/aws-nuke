@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/fms"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,7 +25,10 @@ func ListFMSNotificationChannel(sess *session.Session) ([]Resource, error) {
 	if _, err := svc.GetNotificationChannel(&fms.GetNotificationChannelInput{}); err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			if strings.Contains(aerr.Message(), "No default admin could be found") {
-				logrus.Infof("FMSNotificationChannel: %s. Ignore if you haven't set it up.", aerr.Message())
+				logrus.Infof(
+					"FMSNotificationChannel: %s. Ignore if you haven't set it up.",
+					aerr.Message(),
+				)
 				return nil, nil
 			}
 		} else {

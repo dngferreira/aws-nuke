@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -43,7 +43,11 @@ func ListIAMPolicies(sess *session.Session) ([]Resource, error) {
 			for _, listedPolicy := range page.Policies {
 				policy, err := GetIAMPolicy(svc, listedPolicy.Arn)
 				if err != nil {
-					logrus.Errorf("Failed to get listed policy %s: %v", *listedPolicy.PolicyName, err)
+					logrus.Errorf(
+						"Failed to get listed policy %s: %v",
+						*listedPolicy.PolicyName,
+						err,
+					)
 					continue
 				}
 				policies = append(policies, policy)

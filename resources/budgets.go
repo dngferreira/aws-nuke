@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/budgets"
 	"github.com/aws/aws-sdk-go/service/sts"
-	"github.com/rebuy-de/aws-nuke/v2/pkg/types"
+	"github.com/dngferreira/aws-nuke/v2/pkg/types"
 )
 
 func init() {
@@ -37,12 +37,15 @@ func ListBudgets(sess *session.Session) ([]Resource, error) {
 	}
 
 	buds := make([]*budgets.Budget, 0)
-	err = svc.DescribeBudgetsPages(params, func(page *budgets.DescribeBudgetsOutput, lastPage bool) bool {
-		for _, out := range page.Budgets {
-			buds = append(buds, out)
-		}
-		return true
-	})
+	err = svc.DescribeBudgetsPages(
+		params,
+		func(page *budgets.DescribeBudgetsOutput, lastPage bool) bool {
+			for _, out := range page.Budgets {
+				buds = append(buds, out)
+			}
+			return true
+		},
+	)
 
 	if err != nil {
 		return nil, err
